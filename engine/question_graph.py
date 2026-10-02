@@ -8,6 +8,8 @@ from langgraph.graph import END, START, StateGraph
 from engine.analytics import query_analytics
 from engine.ceiling import TOOL_LIMIT, request_tool
 from engine.interpret import interpret_question
+from engine.model import explain_result
+from engine.reasons import fact_sheet, plain_why
 from engine.tracing import configure_langsmith
 
 
@@ -290,7 +292,12 @@ def _compose_text(plan: dict, evidence: dict) -> str:
 
 def compose_node(state: QuestionState) -> dict:
     answer = _compose_text(state["plan"], state["evidence"])
-    evidence = {**state["evidence"], "answer": answer}
+    sheet = fact_sheet(state["plan"], state["evidence"])
+    why = ""
+    if sheet:
+        why = explain_result(sheet) or plain_why(sheet)
+        answer = f"{answer} {why}"
+    evidence = {**state["evidence"], "answer": answer, "why": why or None}
     title = "Resposta de lacuna" if not state["plan"].get("recognized") or state["evidence"].get("query_error") else "Resposta"
     return {"evidence": evidence, "trace": [_step("compose", title, answer)]}
 

@@ -10,7 +10,7 @@ Não há dado de cliente neste repositório. Não há arquivo `.env`. A chave do
 | --- | --- | --- |
 | Ficha | `engine/interpret.py` | Traduz a frase em métrica, recorte e período. |
 | Catálogo | `engine/catalog.py` | Lista o que a ficha pode pedir. Cidade não entra. |
-| Chamada de IA | `engine/model.py` | Único lugar da API do ChatGPT. Hoje devolve vazio e as regras preenchem a ficha. |
+| Chamada de IA | `engine/model.py` | Com `OPENAI_API_KEY` no `.env`, o modelo preenche a ficha. Sem a chave, as regras preenchem. |
 | Banco | `engine/analytics.py` | Uma consulta. Sem chave, usa a série de exemplo. |
 | Teto | `engine/ceiling.py` | Cada ferramenta dispara no máximo uma vez. |
 | Simulação | `engine/question_graph.py` | Mil repetições da série já carregada. Não volta ao banco. |
@@ -26,6 +26,14 @@ python ask.py "Probabilidade das vendas de copos subirem no próximo mês"
 ```
 
 A resposta diz que a série é de exemplo.
+
+## Ligar a OpenAI
+
+1. Copie `.env.example` para `.env`.
+2. Coloque a sua chave em `OPENAI_API_KEY`.
+3. Rode o `ask.py` de novo. A ficha passa a sair do modelo, e a explicação do número também. A probabilidade continua saindo da série. Sem a chave, a explicação usa só o que a série mostra: semana fraca, semana forte, e a ausência de causa.
+
+Não commite o `.env`.
 
 ## Ligar o seu banco
 
